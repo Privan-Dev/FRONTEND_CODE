@@ -1,0 +1,179 @@
+.position-relative {
+    position: relative;
+}
+
+/* .overlay {
+position: absolute;
+top: 289px !important;
+left: 20px;
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 8px;
+} */
+
+*{
+    margin: 0%;
+    padding: 0%;
+}
+
+
+.overlay i {
+    color: #000000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#currentTime {
+    color: #050505;
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+#customProgressBar {
+    position: relative;
+    height: 37px;
+    cursor: pointer;
+    background-color: rgb(212, 189, 212);
+    border-radius: 5px;
+    margin-top: 50px;
+
+}
+
+#customProgressBar2 {
+    position: relative;
+    height: 37px;
+    cursor: pointer;
+    background-color: rgb(212, 189, 212);
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#seekHandle {
+    position: absolute;
+    height: 100%;
+    width: 10px;
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+#seekHandle2 {
+    position: absolute;
+    height: 100%;
+    width: 10px;
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+.marker {
+    position: absolute;
+    height: 18px;
+    width: 3px;
+    background-color: red;
+    /* border-radius: 50%; */
+    transform: translateX(0);
+    cursor: pointer;
+}
+
+/* .marker:hover {
+    position: absolute;
+    height: 15px;
+    width: 2px;
+    background-color: red;
+    border-radius: 50%;
+    transform: translateX(0);
+    cursor: pointer;
+} */
+
+.timestamp {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: grey;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    color: #fff;
+}
+
+#video-container {
+    margin-top: 5px;
+    overflow: hidden;
+    position: relative;
+    cursor: zoom-in;
+    background-color: rgb(48, 48, 48);
+    /* Change cursor to indicate zoom-in behavior */
+}
+
+#mainVideo {
+    width: 100%;
+    transition: transform 0.3s ease-in-out;
+    background-color: rgb(56, 56, 56);
+}
+
+.btnr {
+    padding: 8px 15px 8px 15px;
+    border: none;
+    font-size: large;
+    background-color: rgb(233, 157, 233);
+    border-radius: 10px;
+}
+
+.btnr:hover{
+    color: white;
+    background-color: #980af7;
+}
+
+
+.b1, .b2{
+    width: 120px;
+    background-color: rgb(233, 157, 233);
+    font-size: 18px;
+    margin: 20px;
+    border-radius: 7px;
+    border: none;
+    padding: 8px 10px 7px 10px;
+    font-weight: 530;
+}
+
+.b1:hover, .b2:hover{
+    background-color: #9849cc;
+    color: white;
+
+}
+
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+    video{
+        height: 610px;
+
+    }
+
+} 
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+    
+    video{
+        height: 650x;
+
+    }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+ @media only screen and (min-width: 1200px) {
+   video{
+    /* background-color: #007bff;
+     */
+     height: 700px;
+   }
+} 

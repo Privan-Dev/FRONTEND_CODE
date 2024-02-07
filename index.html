@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Video Player with Custom Progress Bar</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Font Awesome Icons (you can use your preferred icon library) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- <link href="style.css" rel="stylesheet"> -->
+    <!-- Include css file -->
+    <link rel="stylesheet" href="./css/index.css">
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            margin: 0%;
+            padding: 0%;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="main container-fluid mt-2 ">
+        <!-- Video Player -->
+        <div class="row m-2">
+            <div class="col-md-8 position-relative">
+                <!-- <button class="btn btn-warning mt-3" onclick="resetVideoPosition()">Reset Video</button> -->
+                <button class="btnr" onclick="resetVideoPosition()"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <div id="video-container" onwheel="handleZoom(event)">
+                    <video id="mainVideo" controls muted width="100%" height="300" class="float-start">
+                        <source src="./assets/video1.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div id="customProgressBar">
+                    <div id="seekHandle"></div>
+                    <div id="markersContainer"></div>
+                </div>
+                <div id="customProgressBar2">
+                    <div id="seekHandle2"></div>
+                    <div id="markersContainer2"></div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-center mt-4">
+                    <button class="b1" onclick="markTime()">Team A</button>
+                    <button class="b2" onclick="markTimeB()">Team B</button>
+                </div>
+
+            </div>
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
+    <!-- ... your other HTML code ... -->
+    <!-- <div id="currentTime"></div> -->
+    <!-- ... your other HTML code ... -->
+
+    <!-- Include Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include Font Awesome JS (optional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+
+
+        var video = document.getElementById("mainVideo");
+        var customProgressBar = document.getElementById("customProgressBar");
+        var customProgressBar2 = document.getElementById("customProgressBar2");
+        var seekHandle = document.getElementById("seekHandle");
+        var seekHandle2 = document.getElementById("seekHandle2");
+        var markersContainer = document.getElementById("markersContainer");
+        var playPauseIcon = document.getElementById("playPauseIcon");
+        var currentTimeDisplay = document.getElementById("currentTime");
+        var markers = [];
+        var markersContainer2 = document.getElementById("markersContainer2");
+        // var currentTimeDisplay = document.getElementById("currentTime");
+
+
+        video.addEventListener("timeupdate", function () {
+            var progress = (video.currentTime / video.duration) * 100;
+            updateProgressBar(progress);
+            currentTimeDisplay.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+        });
+        video.addEventListener("timeupdate", function () {
+            var progress = (video.currentTime / video.duration) * 100;
+            updateProgressBar2(progress);
+            currentTimeDisplay.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+        });
+
+        function formatTime(seconds) {
+            var minutes = Math.floor(seconds / 60);
+            var remainingSeconds = Math.floor(seconds % 60);
+            return pad(minutes) + ":" + pad(remainingSeconds);
+        }
+
+        function pad(number) {
+            return (number < 10 ? '0' : '') + number;
+        }
+
+        function togglePlayPause() {
+            if (video.paused) {
+                video.play();
+                playPauseIcon.className = "fas fa-pause";
+            } else {
+                video.pause();
+                playPauseIcon.className = "fas fa-play";
+            }
+        }
+
+        // function seek(event) {
+        //     var percent = event.offsetX / customProgressBar.clientWidth;
+        //     var newTime = percent * video.duration;
+        //     video.currentTime = newTime;
+        //     updateProgressBar(percent * 100);
+        // }
+
+        // function seek2(event) {
+        //     var percent = event.offsetX / customProgressBar2.clientWidth;
+        //     var newTime = percent * video.duration;
+        //     video.currentTime = newTime;
+        //     updateProgressBar2(percent * 100);
+        // }
+
+        function updateProgressBar(progress) {
+            seekHandle.style.left = progress + "%";
+        }
+
+        function updateProgressBar2(progress) {
+            seekHandle2.style.left = progress + "%";
+        }
+
+        var selectedMarker = null;
+
+        // Listen for the delete key
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Delete" && selectedMarker !== null) {
+                removeMarker(selectedMarker);
+                removeMarkerB(selectedMarker);
+                selectedMarker = null; // Reset the selected marker after deletion
+            }
+        });
+
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Delete" && selectedMarker !== null) {
+                if (isMarkerForTeamB(selectedMarker)) {
+                    removeMarkerB(selectedMarker);
+                } else {
+                    removeMarker(selectedMarker);
+                }
+                selectedMarker = null; // Reset the selected marker after deletion
+            }
+        });
+        function isMarkerForTeamB(marker) {
+            // Implement the logic to determine if the marker belongs to Team B
+            // For example, you can check the parent container or any specific class
+            // associated with markers for Team B.
+            return markersContainer2.contains(marker);
+        }
+
+
+
+        function markTime() {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+            var progress = (timeInSeconds / video.duration) * 100;
+
+            var marker = createMarker(progress);
+            markersContainer.appendChild(marker);
+            markers.push(marker);
+
+            saveTimeInDatabase(formatTime(timeInSeconds));
+        }
+
+
+
+        function createMarker(progress) {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+
+            var marker = document.createElement("div");
+            marker.className = "marker";
+            marker.style.left = progress + "%";
+
+            // Uncomment the following code to create the timestamp element
+            var timestamp = document.createElement("div");
+            timestamp.className = "timestamp";
+            timestamp.textContent = formatTime(timeInSeconds);
+            marker.appendChild(timestamp);
+
+            marker.addEventListener("click", function () {
+                event.stopPropagation();
+                selectedMarker = marker;
+                video.currentTime = timeInSeconds;
+                updateProgressBar(progress);
+                updateSeekHandle(progress);
+                playPauseIcon.className = "fas fa-pause";
+            });
+
+            return marker;
+        }
+
+
+        function updateSeekHandle(progress) {
+            var seekHandlePosition = (progress / 100) * customProgressBar.clientWidth;
+            seekHandle.style.left = seekHandlePosition + "px";
+        }
+
+        video.addEventListener("loadedmetadata", function () {
+            var initialProgress = (video.currentTime / video.duration) * 100;
+            updateSeekHandle(initialProgress);
+        });
+
+        function removeMarker(marker) {
+            console.log("Remove Dot...!")
+            var timeInSeconds = extractTimeFromMarker(marker);
+
+            markersContainer.removeChild(marker);
+            markers = markers.filter(function (m) {
+                return m !== marker;
+            });
+
+            removeTimeFromDatabase(formatTime(timeInSeconds));
+        }
+
+        function markTimeB() {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+            var progress = (timeInSeconds / video.duration) * 100;
+
+            var marker = createMarkerB(progress);
+            markersContainer2.appendChild(marker);
+            markers.push(marker);
+
+            saveTimeInDatabaseB(formatTime(timeInSeconds));
+        }
+
+        function createMarkerB(progress) {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+
+            var marker = document.createElement("div");
+            marker.className = "marker";
+            marker.style.left = progress + "%";
+
+            // Create the timestamp element
+            var timestamp = document.createElement("div");
+            timestamp.className = "timestamp";
+            timestamp.textContent = formatTime(timeInSeconds);
+
+            marker.appendChild(timestamp); // Append the timestamp to the marker
+
+            marker.addEventListener("click", function () {
+                event.stopPropagation();
+                selectedMarker = marker;
+                video.currentTime = timeInSeconds;
+                updateProgressBar2(progress);
+                updateSeekHandle2(progress);
+                playPauseIcon.className = "fas fa-pause";
+            });
+
+            return marker;
+        }
+
+        function updateSeekHandle2(progress) {
+            // Calculate the position for the seek handle based on the progress
+            var seekHandlePosition = (progress / 100) * customProgressBar2.clientWidth;
+            seekHandle2.style.left = seekHandlePosition + "px";
+        }
+
+
+        function removeMarkerB(marker) {
+            console.log("Remove Dot...!");
+            var timeInSeconds = extractTimeFromMarker(marker);
+
+            // Check if the marker is a child of markersContainer2 before removing it
+            if (markersContainer2.contains(marker)) {
+                // Log information about the marker and markersContainer2
+                console.log("Marker is a child of markersContainer2");
+                console.log("markersContainer2:", markersContainer2);
+                console.log("marker:", marker);
+
+                // Remove the marker from the DOM and update the markers array
+                markersContainer2.removeChild(marker);
+                markers = markers.filter(function (m) {
+                    return m !== marker;
+                });
+
+                console.log("Marker removed for Team B");
+                removeTimeFromDatabaseB(formatTime(timeInSeconds));
+            } else {
+                console.log("Marker is not a child of markersContainer2");
+            }
+        }
+
+        function extractTimeFromMarker(marker) {
+            // Extract the time from the timestamp associated with the marker
+            var timestampElement = marker.querySelector(".timestamp");
+            var timestampText = timestampElement.textContent;
+            var timeInSeconds = parseTime(timestampText);
+
+            return timeInSeconds;
+        }
+
+        function parseTime(timeString) {
+            // Implement the logic to parse the time string (format: "MM:SS")
+            // and convert it to seconds
+            var timeArray = timeString.split(":");
+            var minutes = parseInt(timeArray[0], 10);
+            var seconds = parseInt(timeArray[1], 10);
+            var timeInSeconds = minutes * 60 + seconds;
+
+            return timeInSeconds;
+        }
+
+
+        var video = document.getElementById("mainVideo");
+        var currentScale = 1; // Initial scale factor
+        var videoContainer = document.getElementById("video-container");
+
+        function handleZoom(event) {
+            // Calculate the cursor position relative to the video container
+            var rect = video.getBoundingClientRect();
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+
+            // Adjust the video scale based on scroll direction
+            if (event.deltaY < 0) {
+                currentScale += 0.1;
+            } else {
+                currentScale -= 0.1;
+            }
+
+            // Apply the scale transformation to the video at the cursor position
+            var transformOriginX = (x / rect.width) * 100 + '%';
+            var transformOriginY = (y / rect.height) * 100 + '%';
+            video.style.transformOrigin = transformOriginX + ' ' + transformOriginY;
+            video.style.transform = 'scale(' + currentScale + ')';
+
+            // Prevent the default scroll behavior
+            event.preventDefault();
+        }
+
+
+        function resetVideoPosition() {
+            // Reset the scale factor to 1
+            currentScale = 1;
+
+            // Reset the video transformation
+            video.style.transform = 'scale(1)';
+        }
+
+        function createMarker(progress) {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+
+            var marker = document.createElement("div");
+            marker.className = "marker";
+
+            // Calculate the position based on the number of markers already present
+            var markersInContainer = markersContainer.getElementsByClassName("marker").length;
+            var yOffset = markersInContainer % 2 === 0 ? 0 : 20; // Alternate between 0 and 20 pixels in the y-direction
+            marker.style.left = progress + "%";
+            marker.style.top = yOffset + "px";
+
+            // Uncomment the following code to create the timestamp element
+            var timestamp = document.createElement("div");
+            timestamp.className = "timestamp";
+            timestamp.textContent = formatTime(timeInSeconds);
+            marker.appendChild(timestamp);
+
+            marker.addEventListener("click", function () {
+                event.stopPropagation();
+                selectedMarker = marker;
+                video.currentTime = timeInSeconds;
+                updateProgressBar(progress);
+                updateSeekHandle(progress);
+                playPauseIcon.className = "fas fa-pause";
+            });
+
+            markersContainer.appendChild(marker); // Always append to markersContainer
+            markers.push(marker);
+
+            saveTimeInDatabase(formatTime(timeInSeconds));
+            return marker;
+        }
+
+        function createMarkerB(progress) {
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+
+            var marker = document.createElement("div");
+            marker.className = "marker";
+
+            // Calculate the position based on the number of markers already present
+            var markersInContainer = markersContainer2.getElementsByClassName("marker").length;
+            var yOffset = markersInContainer % 2 === 0 ? 0 : 20; // Alternate between 0 and 20 pixels in the y-direction
+            marker.style.left = progress + "%";
+            marker.style.top = yOffset + "px";
+
+            // Create the timestamp element
+            var timestamp = document.createElement("div");
+            timestamp.className = "timestamp";
+            timestamp.textContent = formatTime(timeInSeconds);
+            marker.appendChild(timestamp);
+
+            marker.addEventListener("click", function () {
+                event.stopPropagation();
+                selectedMarker = marker;
+                video.currentTime = timeInSeconds;
+                updateProgressBar2(progress);
+                updateSeekHandle2(progress);
+                playPauseIcon.className = "fas fa-pause";
+            });
+
+            markersContainer2.appendChild(marker); // Always append to markersContainer2
+            markers.push(marker);
+
+            saveTimeInDatabaseB(formatTime(timeInSeconds));
+            return marker;
+        }
+        function markTime() {
+            // Check if the video has ended
+            if (video.currentTime >= video.duration) {
+                return; // Exit the function if the video has ended
+            }
+
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+            var progress = (timeInSeconds / video.duration) * 100;
+
+            var marker = createMarker(progress);
+            markersContainer.appendChild(marker);
+            markers.push(marker);
+
+            saveTimeInDatabase(formatTime(timeInSeconds));
+        }
+
+        function markTimeB() {
+            // Check if the video has ended
+            if (video.currentTime >= video.duration) {
+                return; // Exit the function if the video has ended
+            }
+
+            var currentTime = video.currentTime;
+            var timeInSeconds = Math.round(currentTime);
+            var progress = (timeInSeconds / video.duration) * 100;
+
+            var marker = createMarkerB(progress);
+            markersContainer2.appendChild(marker);
+            markers.push(marker);
+
+            saveTimeInDatabaseB(formatTime(timeInSeconds));
+        }
+
+
+        $(document).ready(function () {
+            $('.dropdown-submenu a.test').on("click", function (e) {
+                $(this).next('ul').toggle();
+                // Hide any open menus that are not children of the clicked item
+                $('.dropdown-submenu').not($(this).parents()).find('.dropdown-menu').hide();
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        });
+
+
+
+
+
+
+    </script>
+</body>
+
+</html
